@@ -1,5 +1,3 @@
--Summer 2019 Developer Intern Challenge Question.
-
 -The API was built using Node.js. Make sure that Node.js and NPM are installed. 
 -The information about the database is in the file mlablogin.txt
 
