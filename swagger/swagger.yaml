@@ -1,0 +1,268 @@
+swagger: "2.0"
+info:
+  description: "This is an API for a simple online market. "
+  version: "1.0.0"
+  title: "Online Marketplace"
+host: "localhost:8000"
+basePath: "/api"
+tags:
+- name: "products"
+  description: "Products in the store"
+- name: "shopping-cart"
+  description: "Shopping-cart of a user"
+- name: "order"
+  description: "Order place by a user"
+schemes:
+- "http"
+paths:
+  /products:
+    get:
+      tags:
+        - "products"
+      summary: "Returns a list of all the products in the store"
+      produces:
+      - "application/json"
+      
+      parameters:
+      - name: "criteria"
+        in: "query"
+        description: "Criteria value to sort the products list"
+        required: true
+        type: "string"
+        enum:
+          - "available"
+      responses:
+        200:
+          description: "Successful operation. Returns a list of all the products in the store "
+          schema:
+            type: "array"
+            items: 
+              $ref: "#/definitions/Product"
+  /products/{productId}:
+    get:
+      tags:
+      - "products"
+      summary: "Returns the product associate with the id"
+      operationId: "getProductById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "productId"
+        in: "path"
+        description: "ID of product to return"
+        required: true
+        type: "integer"
+        minimum: 0
+      responses:
+        200:
+          description: "Successful operation. Returns the product associate with the id."
+          schema:
+            $ref: "#/definitions/Product"
+        400:
+          description: "Bad Request. Invalid ID supplied"
+        404:
+          description: "Product not found."
+  /shoppingCart:
+    get:
+      tags:
+      - "shopping-cart"
+      summary: "Returns the content of the shopping-cart"
+      operationId: "getShoppingCart"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Successful operation. Returns the items in the shopping-cart and the total amount."
+          schema:
+            type: "object"
+            properties:   
+              cart:
+                type: "array"
+                items: 
+                  type: "object"
+                  properties:
+                    productId: 
+                      type: integer
+                      example: 2
+                    quantity:
+                      type: "integer"
+                      example: 3
+                
+              totalAmount:
+                type: "number"
+                example: 123.43
+ 
+    post:
+      tags:
+      - "shopping-cart"
+      summary: "Add an item to the shopping-cart"
+      operationId: "addShoppingCart"
+      consumes:
+      - "application/json"
+      
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Product object to be added to the cart"
+        required: true
+        schema:
+          type: "object"
+          properties:
+                productId: 
+                  type: "integer"
+                  example: 2
+                quantity:
+                  type: "integer"
+                  example: 1
+      responses:
+        201:
+          description: "Successful operation. The product has been added to the cart."
+        400:
+          description: "Bad request. Invalid Parameters"
+          
+    delete:
+      tags:
+      - "shopping-cart"
+      summary: "Delete all the items in the cart"
+      operationId: "deleteCart"
+      parameters: []
+      responses:
+        204:
+          description: "All content of the cart has been deleted"
+      
+  /shoppingCart/{productId}:  
+    put:
+      tags:
+      - "shopping-cart"
+      summary: "Update the quantity of the item associate with the id"
+      operationId: "updateShoppingCart"
+      consumes:
+      - "application/json"
+      
+      parameters:
+      - name: "productId"
+        in: "path"
+        description: "ID of the product to update"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "Product object to be added to the cart"
+        required: true
+        schema:
+          type: "object"
+          properties:
+                quantity:
+                  type: "integer"
+                  example: 1
+  
+      responses:
+        201:
+          description: "successful operation"
+        400:
+          description: "Bad Request. Invalid ID supplied"
+        404:
+          description: "Product not found in the cart"
+    delete:
+      tags:
+      - "shopping-cart"
+      summary: "Delete the item associate with the id"
+      operationId: "deleteItemShoppingCart"
+     
+      parameters:
+      - name: "productId"
+        in: "path"
+        description: "ID of the product to delete"
+        required: true
+        type: "integer"
+  
+      responses:
+        204:
+          description: "successful operation"
+        404:
+          description: "Product not found in the cart"
+                
+  /order:
+    post:
+      tags:
+      - "order"
+      summary: "Create an order"
+      operationId: "addOrder"
+      consumes:
+      - "application/json"
+      
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "New order object"
+        required: true
+        schema:
+           type: "object"
+           properties:
+              firstName:
+                type: "string"
+                example: "Kevin"
+              lastName:
+                type: "string"
+                example: "Owens"
+              products:
+                type: "array"
+                items: 
+                    type: "object"
+                    properties:
+                      productId: 
+                        type: integer
+                        example: 2
+                      quantity:
+                        type: "integer"
+                        example: 3
+      responses:
+        201:
+          description: "Successful operation. The order has been successfully created."
+        400:
+          description: "Bad request. Invalid Parameters"
+      
+      
+definitions:
+  Order:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        example: 1
+      firstName:
+        type: "string"
+        example: "Kevin"
+      lastName:
+        type: "string"
+        example: "Owens"
+      products:
+        type: "array"
+        items: 
+            type: "object"
+            properties:
+              productId: 
+                type: integer
+                example: 2
+              quantity:
+                type: "integer"
+                example: 3
+      
+  
+  Product:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        example: 1
+      title:
+        type: "string"
+        example: "PS4"
+      price:
+        type: "number"
+        example: "3.14"
+      inventory_count:
+        type: "integer"
+        
+  
